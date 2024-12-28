@@ -1,14 +1,6 @@
-# projectc_flutter
+# Flutter App for Project C
 
-A new Flutter project with Serverpod.
-
-## Getting Started
-
-This project is a starting point for a Flutter application that is using
-Serverpod.
-
-A great starting point for learning Serverpod is our documentation site at:
-[https://docs.serverpod.dev](https://docs.serverpod.dev).
+This will contain the app for Project C
 
 To run the project, first make sure that the server is running, then do:
 

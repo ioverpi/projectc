@@ -1,0 +1,56 @@
+version: '3.7'
+
+services:
+  # Development services
+  postgres:
+    image: postgres:16.3
+    ports:
+      - '8090:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: projectc
+      POSTGRES_PASSWORD: "zlRpi7Qv2JEIlYz9vWicgQTZS8wOn5E-"
+    volumes:
+      - projectc_data:/var/lib/postgresql/data
+    profiles:
+      - '' # Default profile
+      - dev
+  redis:
+    image: redis:6.2.6
+    ports:
+      - '8091:6379'
+    command: redis-server --requirepass "QqfUXdhkvu0Ha9tBSPVJoWM1bfZOqqB5"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    profiles:
+      - '' # Default profile
+      - dev
+
+  # Test services
+  postgres_test:
+    image: postgres:16.3
+    ports:
+      - '9090:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: projectc_test
+      POSTGRES_PASSWORD: "6TUBAb50rAWGirVGvzJuxt_7B-GCgduZ"
+    volumes:
+      - projectc_test_data:/var/lib/postgresql/data
+    profiles:
+      - '' # Default profile
+      - test
+  redis_test:
+    image: redis:6.2.6
+    ports:
+      - '9091:6379'
+    command: redis-server --requirepass "J4QEcoEIBMBX8V_JIKp6ugCSQUxfhflv"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    profiles:
+      - '' # Default profile
+      - test
+
+volumes:
+  projectc_data:
+  projectc_test_data:

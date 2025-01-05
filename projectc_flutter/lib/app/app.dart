@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projectc_flutter/features/songs/presentation/song.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -9,7 +10,7 @@ class MyApp extends StatelessWidget {
       title: 'Serverpod Demo',
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
-      home: Placeholder(), //const MyHomePage(title: 'Serverpod Example'),
+      home: SongPage(), //const MyHomePage(title: 'Serverpod Example'),
     );
   }
 }

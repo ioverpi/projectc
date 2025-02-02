@@ -4,6 +4,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final playerStateProvider = StateProvider<PlayerState?>((ref) => null,);
 
+class VolumeNotifier extends StateNotifier<double> {
+  VolumeNotifier(this.playerId) : super(1);
+
+  final int playerId;
+
+  void setVolume(double volume) => {state = volume};
+}
+final volumeProvider = StateNotifierProvider.family<VolumeNotifier, double, int>(
+  (ref, playerId) => VolumeNotifier(playerId),
+);
+
 class SongPage extends ConsumerStatefulWidget {
   final List<AudioPlayer> players;
   const SongPage({
@@ -17,11 +28,20 @@ class SongPage extends ConsumerStatefulWidget {
 
 class _SongPage extends ConsumerState<SongPage> {
   List<AudioPlayer> get players => widget.players;
+
+  late List<String> sources;
+
+  @override  
+  void initState() {
+    super.initState();
+    sources = [for (int i = 0; i < players.length; i++) (players[i].source as UrlSource).url.split("/")[(players[i].source as UrlSource).url.split("/").length-1]];
+  }
   
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).primaryColor;
     final playerState = ref.watch(playerStateProvider);
+    final volume = [for (int i = 0; i < players.length; i++) ref.watch(volumeProvider(i))];
     return Scaffold(
       appBar: AppBar(
         title: const Text("Song"),
@@ -55,28 +75,36 @@ class _SongPage extends ConsumerState<SongPage> {
                 )
               ]
             ),
-            FilledButton(
-              child: const Text("Press me"),
-              onPressed: () async {
-                AudioPlayer player1 = AudioPlayer();
-                AudioPlayer player2 = AudioPlayer();
-            
-                await player1.setSource(UrlSource("https://samplelib.com/lib/preview/mp3/sample-6s.mp3"));
-                await player2.setSource(UrlSource("https://samplelib.com/lib/preview/mp3/sample-9s.mp3"));
-            
-                player1.onPositionChanged.listen((Duration p) {
-                  print("Current position player 1: $p");
-                });
-            
-                player2.onPositionChanged.listen((Duration p) {
-                  print("Current position player 2: $p");
-                });
-            
-                await Future.wait([
-                  player1.resume(),
-                  player2.resume(),
-                ]);
-              }, 
+            Column(
+              children: [
+                for (int i = 0; i < players.length; i++)
+                Container(
+                  width: 300, // TODO: use a media query.
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    color: Theme.of(context).primaryColorLight,
+                  ),
+                  padding: EdgeInsets.all(10),
+                  margin: EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Track ${i+1}"),
+                            Text(sources[i]),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: volume[i] == 0.0 ? () => _unmute(i) : () => _mute(i), 
+                        icon: volume[i] == 0.0 ? Icon(Icons.volume_up) : Icon(Icons.volume_mute),
+                      )
+                    ],
+                  )
+                )
+              ]
             ),
           ],
         ),
@@ -105,5 +133,15 @@ class _SongPage extends ConsumerState<SongPage> {
       player.stop()
     ]);
     ref.read(playerStateProvider.notifier).state = PlayerState.stopped;
+  }
+
+  Future<void> _mute(int playerId) async {
+    await players[playerId].setVolume(0);
+    ref.read(volumeProvider(playerId).notifier).setVolume(0);
+  }
+
+  Future<void> _unmute(int playerId) async {
+    await players[playerId].setVolume(1);
+    ref.read(volumeProvider(playerId).notifier).setVolume(1);
   }
 }

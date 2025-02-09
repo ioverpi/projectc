@@ -12,8 +12,8 @@ class MyApp extends StatelessWidget {
     AudioPlayer player1 = AudioPlayer();
     AudioPlayer player2 = AudioPlayer();
 
-    player1.setSource(UrlSource("https://samplelib.com/lib/preview/mp3/sample-6s.mp3"));
-    player2.setSource(UrlSource("https://samplelib.com/lib/preview/mp3/sample-9s.mp3"));
+    player1.setSource(AssetSource("atrack.mp3"));
+    player2.setSource(AssetSource("btrack.mp3"));
 
     return MaterialApp(
       title: 'Serverpod Demo',

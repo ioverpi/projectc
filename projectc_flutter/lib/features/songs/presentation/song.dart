@@ -34,7 +34,7 @@ class _SongPage extends ConsumerState<SongPage> {
   @override  
   void initState() {
     super.initState();
-    sources = [for (int i = 0; i < players.length; i++) (players[i].source as UrlSource).url.split("/")[(players[i].source as UrlSource).url.split("/").length-1]];
+    sources = [for (int i = 0; i < players.length; i++) "Track $i"];
   }
   
   @override
@@ -97,9 +97,14 @@ class _SongPage extends ConsumerState<SongPage> {
                           ],
                         ),
                       ),
+                      Slider(
+                        value: volume[i], 
+                        onChanged: (double value) => _setVolume(i, value),
+                      ),
                       IconButton(
                         onPressed: volume[i] == 0.0 ? () => _unmute(i) : () => _mute(i), 
-                        icon: volume[i] == 0.0 ? Icon(Icons.volume_up) : Icon(Icons.volume_mute),
+                        icon: Icon(getVolumeIcon(volume[i])),
+                        // icon: volume[i] == 0.0 ? Icon(Icons.volume_up) : Icon(Icons.volume_mute),
                       )
                     ],
                   )
@@ -110,6 +115,15 @@ class _SongPage extends ConsumerState<SongPage> {
         ),
       ),
     );
+  }
+
+  IconData getVolumeIcon(double volume) {
+    if (volume == 0.0) {
+      return Icons.volume_mute;
+    } else if (volume > 0.0 && volume < 0.5) {
+      return Icons.volume_down;
+    } 
+    return Icons.volume_up;
   }
 
   Future<void> _play() async {
@@ -143,5 +157,10 @@ class _SongPage extends ConsumerState<SongPage> {
   Future<void> _unmute(int playerId) async {
     await players[playerId].setVolume(1);
     ref.read(volumeProvider(playerId).notifier).setVolume(1);
+  }
+
+  Future<void> _setVolume(int playerId, double value) async {
+    await players[playerId].setVolume(value);
+    ref.read(volumeProvider(playerId).notifier).setVolume(value);
   }
 }
